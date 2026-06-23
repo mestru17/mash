@@ -21,13 +21,12 @@ int main() {
         for (cmdlen = 0; cmd[cmdlen] != '\0' && !isspace(cmd[cmdlen]); cmdlen++)
             ;
 
-        if (cmdlen == 0)
-            continue;
-
         if (cmdlen == 4 && strncmp(cmd, "exit", cmdlen) == 0)
             return EXIT_SUCCESS;
 
-        if (cmdlen == 4 && strncmp(cmd, "echo", cmdlen) == 0) {
+        if (cmdlen == 0) {
+            // do nothing
+        } else if (cmdlen == 4 && strncmp(cmd, "echo", cmdlen) == 0) {
             char *next;
             for (next = cmd + cmdlen; isspace(*next); next++)
                 ;
@@ -35,25 +34,20 @@ int main() {
                 if (!isspace(*(next - 1)) || !isspace(*next))
                     putchar(*next);
             printf("\n");
-            continue;
-        }
-
-        if (cmdlen == 3 && strncmp(cmd, "pwd", cmdlen) == 0) {
+        } else if (cmdlen == 3 && strncmp(cmd, "pwd", cmdlen) == 0) {
             char cwd[64];
             getcwd(cwd, 64);
             printf("%s\n", cwd);
-            continue;
-        }
-
-        if (cmdlen == 2 && strncmp(cmd, "cd", cmdlen) == 0) {
+        } else if (cmdlen == 2 && strncmp(cmd, "cd", cmdlen) == 0) {
             char path[64];
             if (sscanf(cmd + cmdlen, "%63s", path) == EOF)
                 perror("cd: failed to parse path");
             else if (chdir(path) != 0)
                 perror("cd: failed to change dir");
-            continue;
+        } else {
+            printf("%.*s: command not found\n", (int)cmdlen, cmd);
         }
 
-        printf("%.*s: command not found\n\n", (int)cmdlen, cmd);
+        printf("\n");
     }
 }
