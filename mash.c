@@ -2,13 +2,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 int main() {
-    char line[64];
-
     for (;;) {
         printf("$ ");
 
+        char line[64];
         if (fgets(line, sizeof(line), stdin) == NULL) {
             perror("failed to read line");
             return EXIT_FAILURE;
@@ -35,6 +35,22 @@ int main() {
                 if (!isspace(*(next - 1)) || !isspace(*next))
                     putchar(*next);
             printf("\n");
+            continue;
+        }
+
+        if (cmdlen == 3 && strncmp(cmd, "pwd", cmdlen) == 0) {
+            char cwd[64];
+            getcwd(cwd, 64);
+            printf("%s\n", cwd);
+            continue;
+        }
+
+        if (cmdlen == 2 && strncmp(cmd, "cd", cmdlen) == 0) {
+            char path[64];
+            if (sscanf(cmd + cmdlen, "%63s", path) == EOF)
+                perror("cd: failed to parse path");
+            else if (chdir(path) != 0)
+                perror("cd: failed to change dir");
             continue;
         }
 
