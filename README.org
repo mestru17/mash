@@ -1,0 +1,3 @@
+#+title: [ma]thias [sh]ell
+
+Because bash is old and fish is weird.
