@@ -16,7 +16,7 @@ int main() {
 
         char *cmd;
         size_t cmdlen;
-        for (cmd = line; isspace(cmd[0]); cmd++)
+        for (cmd = line; isspace(*cmd); cmd++)
             ;
         for (cmdlen = 0; cmd[cmdlen] != '\0' && !isspace(cmd[cmdlen]); cmdlen++)
             ;
