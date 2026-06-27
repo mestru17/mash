@@ -24,9 +24,7 @@ int main() {
         if (cmdlen == 4 && strncmp(cmd, "exit", cmdlen) == 0)
             return EXIT_SUCCESS;
 
-        if (cmdlen == 0) {
-            // do nothing
-        } else if (cmdlen == 4 && strncmp(cmd, "echo", cmdlen) == 0) {
+        if (cmdlen == 4 && strncmp(cmd, "echo", cmdlen) == 0) {
             char *next;
             for (next = cmd + cmdlen; isspace(*next); next++)
                 ;
@@ -44,7 +42,7 @@ int main() {
                 perror("cd: failed to parse path");
             else if (chdir(path) != 0)
                 perror("cd: failed to change dir");
-        } else {
+        } else if (cmdlen != 0) {
             printf("%.*s: command not found\n", (int)cmdlen, cmd);
         }
 
