@@ -46,7 +46,7 @@ int main() {
             if (sscanf(cmd + cmdlen, "%63s", path) == EOF)
                 perror("cd: failed to parse path");
             else if (chdir(path) != 0)
-                perror("cd: failed to change dir");
+                perror("cd: failed to change directory");
         } else if (cmdlen != 0) {
             printf("%.*s: command not found\n", (int)cmdlen, cmd);
         }
