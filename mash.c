@@ -13,8 +13,8 @@ int main() {
         printf("$ ");
 
         char line[64];
-        if (fgets(line, sizeof(line), stdin) == NULL) {
-            perror("failed to read line");
+        if (!fgets(line, sizeof(line), stdin)) {
+            fputs("failed to read line\n", stderr);
             return EXIT_FAILURE;
         }
 
