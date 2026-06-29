@@ -44,8 +44,8 @@ static void pwd() {
 
 static void cd(char *input) {
     char *arg;
-    size_t length;
-    if (!(length = next_word(&input, &arg))) {
+    size_t length = next_word(&input, &arg);
+    if (length == 0) {
         fprintf(stderr, "usage: cd <path>");
         return;
     }
