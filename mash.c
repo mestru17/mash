@@ -17,6 +17,46 @@ static char *skip_whitespace(char *c) {
     return c;
 }
 
+static size_t next_word(char **current, char **start) {
+    *start = skip_whitespace(*current);
+    *current = *start;
+    while (**current != '\0' && !is_whitespace(**current))
+        (*current)++;
+    return *current - *start;
+}
+
+static void echo(char *input) {
+    char *arg;
+    size_t length = next_word(&input, &arg);
+    if (length != 0) {
+        printf("%.*s", (int)length, arg);
+        while ((length = next_word(&input, &arg)) != 0)
+            printf(" %.*s", (int)length, arg);
+    }
+    printf("\n");
+}
+
+static void pwd() {
+    char cwd[64];
+    getcwd(cwd, 64);
+    printf("%s\n", cwd);
+}
+
+static void cd(char *input) {
+    char *arg;
+    size_t length;
+    if (!(length = next_word(&input, &arg))) {
+        fprintf(stderr, "usage: cd <path>");
+        return;
+    }
+
+    char path[length + 1];
+    strncpy(path, arg, length);
+    path[length] = '\0';
+    if (chdir(path) != 0)
+        perror("cd: failed to change directory");
+}
+
 int main() {
     for (;;) {
         printf("$ ");
@@ -27,35 +67,20 @@ int main() {
             return EXIT_FAILURE;
         }
 
-        char *command = skip_whitespace(line);
-        size_t command_length;
-        for (command_length = 0; command[command_length] != '\0' &&
-                                 !is_whitespace(command[command_length]);
-             command_length++)
-            ;
+        char *current = line;
+        char *command;
+        size_t command_length = next_word(&current, &command);
 
         if (IS_LITERAL(command, command_length, "exit"))
-            return EXIT_SUCCESS;
-
-        if (IS_LITERAL(command, command_length, "echo")) {
-            char *next = skip_whitespace(command + command_length);
-            for (; *next != '\0' && *next != '\n'; next++)
-                if (!is_whitespace(*(next - 1)) || !is_whitespace(*next))
-                    putchar(*next);
-            printf("\n");
-        } else if (IS_LITERAL(command, command_length, "pwd")) {
-            char cwd[64];
-            getcwd(cwd, 64);
-            printf("%s\n", cwd);
-        } else if (IS_LITERAL(command, command_length, "cd")) {
-            char path[64];
-            if (sscanf(command + command_length, "%63s", path) == EOF)
-                perror("cd: failed to parse path");
-            else if (chdir(path) != 0)
-                perror("cd: failed to change directory");
-        } else if (command_length != 0) {
+            exit(EXIT_SUCCESS);
+        else if (IS_LITERAL(command, command_length, "echo"))
+            echo(current);
+        else if (IS_LITERAL(command, command_length, "pwd"))
+            pwd();
+        else if (IS_LITERAL(command, command_length, "cd"))
+            cd(current);
+        else if (command_length != 0)
             printf("%.*s: command not found\n", (int)command_length, command);
-        }
 
         printf("\n");
     }
