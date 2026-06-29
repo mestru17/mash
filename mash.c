@@ -37,8 +37,8 @@ static void echo(char *input) {
 }
 
 static void pwd() {
-    char cwd[64];
-    getcwd(cwd, 64);
+    char cwd[1024];
+    getcwd(cwd, sizeof(cwd));
     printf("%s\n", cwd);
 }
 
@@ -61,7 +61,7 @@ int main() {
     for (;;) {
         printf("$ ");
 
-        char line[64];
+        char line[1024];
         if (!fgets(line, sizeof(line), stdin)) {
             fputs("failed to read line\n", stderr);
             return EXIT_FAILURE;
