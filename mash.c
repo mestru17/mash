@@ -27,33 +27,34 @@ int main() {
             return EXIT_FAILURE;
         }
 
-        char *cmd = skip_whitespace(line);
-        size_t cmdlen;
-        for (cmdlen = 0; cmd[cmdlen] != '\0' && !is_whitespace(cmd[cmdlen]);
-             cmdlen++)
+        char *command = skip_whitespace(line);
+        size_t command_length;
+        for (command_length = 0; command[command_length] != '\0' &&
+                                 !is_whitespace(command[command_length]);
+             command_length++)
             ;
 
-        if (IS_LITERAL(cmd, cmdlen, "exit"))
+        if (IS_LITERAL(command, command_length, "exit"))
             return EXIT_SUCCESS;
 
-        if (IS_LITERAL(cmd, cmdlen, "echo")) {
-            char *next = skip_whitespace(cmd + cmdlen);
+        if (IS_LITERAL(command, command_length, "echo")) {
+            char *next = skip_whitespace(command + command_length);
             for (; *next != '\0' && *next != '\n'; next++)
                 if (!is_whitespace(*(next - 1)) || !is_whitespace(*next))
                     putchar(*next);
             printf("\n");
-        } else if (IS_LITERAL(cmd, cmdlen, "pwd")) {
+        } else if (IS_LITERAL(command, command_length, "pwd")) {
             char cwd[64];
             getcwd(cwd, 64);
             printf("%s\n", cwd);
-        } else if (IS_LITERAL(cmd, cmdlen, "cd")) {
+        } else if (IS_LITERAL(command, command_length, "cd")) {
             char path[64];
-            if (sscanf(cmd + cmdlen, "%63s", path) == EOF)
+            if (sscanf(command + command_length, "%63s", path) == EOF)
                 perror("cd: failed to parse path");
             else if (chdir(path) != 0)
                 perror("cd: failed to change directory");
-        } else if (cmdlen != 0) {
-            printf("%.*s: command not found\n", (int)cmdlen, cmd);
+        } else if (command_length != 0) {
+            printf("%.*s: command not found\n", (int)command_length, command);
         }
 
         printf("\n");
