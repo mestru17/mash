@@ -3,6 +3,9 @@
 #include <string.h>
 #include <unistd.h>
 
+#define IS_LITERAL(string, length, literal)                                    \
+    length == sizeof(literal) - 1 && strncmp(string, literal, length) == 0
+
 static int is_whitespace(char c) {
     return c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' ||
            c == '\v';
@@ -30,20 +33,20 @@ int main() {
              cmdlen++)
             ;
 
-        if (cmdlen == 4 && strncmp(cmd, "exit", cmdlen) == 0)
+        if (IS_LITERAL(cmd, cmdlen, "exit"))
             return EXIT_SUCCESS;
 
-        if (cmdlen == 4 && strncmp(cmd, "echo", cmdlen) == 0) {
+        if (IS_LITERAL(cmd, cmdlen, "echo")) {
             char *next = skip_whitespace(cmd + cmdlen);
             for (; *next != '\0' && *next != '\n'; next++)
                 if (!is_whitespace(*(next - 1)) || !is_whitespace(*next))
                     putchar(*next);
             printf("\n");
-        } else if (cmdlen == 3 && strncmp(cmd, "pwd", cmdlen) == 0) {
+        } else if (IS_LITERAL(cmd, cmdlen, "pwd")) {
             char cwd[64];
             getcwd(cwd, 64);
             printf("%s\n", cwd);
-        } else if (cmdlen == 2 && strncmp(cmd, "cd", cmdlen) == 0) {
+        } else if (IS_LITERAL(cmd, cmdlen, "cd")) {
             char path[64];
             if (sscanf(cmd + cmdlen, "%63s", path) == EOF)
                 perror("cd: failed to parse path");
