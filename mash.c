@@ -8,6 +8,12 @@ static int is_whitespace(char c) {
            c == '\v';
 }
 
+static char *skip_whitespace(char *c) {
+    while (is_whitespace(*c))
+        c++;
+    return c;
+}
+
 int main() {
     for (;;) {
         printf("$ ");
@@ -18,10 +24,8 @@ int main() {
             return EXIT_FAILURE;
         }
 
-        char *cmd;
+        char *cmd = skip_whitespace(line);
         size_t cmdlen;
-        for (cmd = line; is_whitespace(*cmd); cmd++)
-            ;
         for (cmdlen = 0; cmd[cmdlen] != '\0' && !is_whitespace(cmd[cmdlen]);
              cmdlen++)
             ;
@@ -30,9 +34,7 @@ int main() {
             return EXIT_SUCCESS;
 
         if (cmdlen == 4 && strncmp(cmd, "echo", cmdlen) == 0) {
-            char *next;
-            for (next = cmd + cmdlen; is_whitespace(*next); next++)
-                ;
+            char *next = skip_whitespace(cmd + cmdlen);
             for (; *next != '\0' && *next != '\n'; next++)
                 if (!is_whitespace(*(next - 1)) || !is_whitespace(*next))
                     putchar(*next);
