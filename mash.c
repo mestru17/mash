@@ -29,7 +29,7 @@ static void cd(char *input) {
     char *arg;
     size_t length = next_word(&input, &arg);
     if (length == 0) {
-        fprintf(stderr, "usage: cd <path>");
+        fprintf(stderr, "usage: cd <path>\n");
         return;
     }
 
