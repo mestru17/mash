@@ -4,7 +4,7 @@
 #include <unistd.h>
 
 #define IS_LITERAL(string, length, literal)                                    \
-    length == sizeof(literal) - 1 && strncmp(string, literal, length) == 0
+    length == sizeof(literal) - 1 && memcmp(string, literal, length) == 0
 
 static int is_whitespace(char c) {
     return c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' ||
