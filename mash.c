@@ -11,15 +11,10 @@ static int is_whitespace(char c) {
            c == '\v';
 }
 
-static char *skip_whitespace(char *c) {
-    while (is_whitespace(*c))
-        c++;
-    return c;
-}
-
 static size_t next_word(char **current, char **start) {
-    *start = skip_whitespace(*current);
-    *current = *start;
+    while (is_whitespace(**current))
+        (*current)++;
+    *start = *current;
     while (**current != '\0' && !is_whitespace(**current))
         (*current)++;
     return *current - *start;
