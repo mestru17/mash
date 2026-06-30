@@ -24,7 +24,7 @@ static void cd(char *input) {
     char *arg;
     size_t length = next_word(&input, &arg);
     if (length == 0) {
-        fprintf(stderr, "usage: cd <path>\n");
+        fprintf(stderr, "cd: yo dawg, you gotta tell me where we rollin'\n");
         return;
     }
 
@@ -32,7 +32,7 @@ static void cd(char *input) {
     memcpy(path, arg, length);
     path[length] = '\0';
     if (chdir(path) != 0)
-        perror("cd: failed to change directory");
+        perror("cd: nah homie, that hood don't exist");
 }
 
 static void echo(char *input) {
@@ -50,7 +50,7 @@ static void pwd(void) {
     size_t size = 1024;
     char cwd[size];
     if (getcwd(cwd, size) == NULL)
-        perror("pwd: failed to get working directory");
+        perror("pwd: dang, I done lost track of where we at");
     else
         printf("%s\n", cwd);
 }
@@ -61,7 +61,7 @@ int main(void) {
 
         char line[1024];
         if (!fgets(line, sizeof(line), stdin)) {
-            fputs("failed to read line\n", stderr);
+            fputs("ay yo, couldn't catch what you sayin', my bad\n", stderr);
             return EXIT_FAILURE;
         }
 
@@ -78,7 +78,8 @@ int main(void) {
         else if (IS_LITERAL(command, command_length, "pwd"))
             pwd();
         else if (command_length != 0)
-            printf("%.*s: command not found\n", (int)command_length, command);
+            printf("%.*s: that ain't no command I know, playa\n",
+                   (int)command_length, command);
 
         printf("\n");
     }
