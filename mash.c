@@ -47,9 +47,8 @@ static void echo(char *input) {
 }
 
 static void pwd(void) {
-    size_t size = 1024;
-    char cwd[size];
-    if (getcwd(cwd, size) == NULL)
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
         perror("pwd: dang, I done lost track of where we at");
     else
         printf("%s\n", cwd);
@@ -57,6 +56,11 @@ static void pwd(void) {
 
 int main(void) {
     for (;;) {
+        char cwd[1024];
+        if (getcwd(cwd, sizeof(cwd)) == NULL)
+            printf("dang, I done lost track of where we at\n");
+        else
+            printf("%s\n", cwd);
         printf("$ ");
 
         char line[1024];
