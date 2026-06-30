@@ -25,6 +25,21 @@ static size_t next_word(char **current, char **start) {
     return *current - *start;
 }
 
+static void cd(char *input) {
+    char *arg;
+    size_t length = next_word(&input, &arg);
+    if (length == 0) {
+        fprintf(stderr, "usage: cd <path>");
+        return;
+    }
+
+    char path[length + 1];
+    strncpy(path, arg, length);
+    path[length] = '\0';
+    if (chdir(path) != 0)
+        perror("cd: failed to change directory");
+}
+
 static void echo(char *input) {
     char *arg;
     size_t length = next_word(&input, &arg);
@@ -42,21 +57,6 @@ static void pwd() {
     printf("%s\n", cwd);
 }
 
-static void cd(char *input) {
-    char *arg;
-    size_t length = next_word(&input, &arg);
-    if (length == 0) {
-        fprintf(stderr, "usage: cd <path>");
-        return;
-    }
-
-    char path[length + 1];
-    strncpy(path, arg, length);
-    path[length] = '\0';
-    if (chdir(path) != 0)
-        perror("cd: failed to change directory");
-}
-
 int main() {
     for (;;) {
         printf("$ ");
@@ -71,14 +71,14 @@ int main() {
         char *command;
         size_t command_length = next_word(&current, &command);
 
-        if (IS_LITERAL(command, command_length, "exit"))
-            exit(EXIT_SUCCESS);
+        if (IS_LITERAL(command, command_length, "cd"))
+            cd(current);
         else if (IS_LITERAL(command, command_length, "echo"))
             echo(current);
+        else if (IS_LITERAL(command, command_length, "exit"))
+            exit(EXIT_SUCCESS);
         else if (IS_LITERAL(command, command_length, "pwd"))
             pwd();
-        else if (IS_LITERAL(command, command_length, "cd"))
-            cd(current);
         else if (command_length != 0)
             printf("%.*s: command not found\n", (int)command_length, command);
 
