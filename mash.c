@@ -51,7 +51,7 @@ static void echo(char *input) {
     printf("\n");
 }
 
-static void pwd() {
+static void pwd(void) {
     size_t size = 1024;
     char cwd[size];
     if (getcwd(cwd, size) == NULL)
@@ -60,7 +60,7 @@ static void pwd() {
         printf("%s\n", cwd);
 }
 
-int main() {
+int main(void) {
     for (;;) {
         printf("$ ");
 
