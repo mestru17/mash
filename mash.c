@@ -52,9 +52,12 @@ static void echo(char *input) {
 }
 
 static void pwd() {
-    char cwd[1024];
-    getcwd(cwd, sizeof(cwd));
-    printf("%s\n", cwd);
+    size_t size = 1024;
+    char cwd[size];
+    if (getcwd(cwd, size) == NULL)
+        perror("pwd: failed to get working directory");
+    else
+        printf("%s\n", cwd);
 }
 
 int main() {
