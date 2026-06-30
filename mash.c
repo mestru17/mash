@@ -6,6 +6,22 @@
 #define IS_LITERAL(string, length, literal)                                    \
     length == sizeof(literal) - 1 && memcmp(string, literal, length) == 0
 
+static void print_prompt(void) {
+    char cwd[1024];
+    if (getcwd(cwd, sizeof(cwd)) == NULL)
+        printf("dang, I done lost track of where we at\n");
+    else
+        printf("%s\n", cwd);
+    printf("$ ");
+}
+
+static void read_line(char *line, size_t len) {
+    if (!fgets(line, len, stdin)) {
+        fputs("ay yo, couldn't catch what you sayin', my bad\n", stderr);
+        exit(EXIT_FAILURE);
+    }
+}
+
 static int is_whitespace(char c) {
     return c == ' ' || c == '\f' || c == '\n' || c == '\r' || c == '\t' ||
            c == '\v';
@@ -54,37 +70,32 @@ static void pwd(void) {
         printf("%s\n", cwd);
 }
 
+static void run_command(char *current, char *command, size_t len) {
+    if (IS_LITERAL(command, len, "cd"))
+        cd(current);
+    else if (IS_LITERAL(command, len, "echo"))
+        echo(current);
+    else if (IS_LITERAL(command, len, "exit"))
+        exit(EXIT_SUCCESS);
+    else if (IS_LITERAL(command, len, "pwd"))
+        pwd();
+    else if (len != 0)
+        printf("%.*s: that ain't no command I know, playa\n", (int)len,
+               command);
+    printf("\n");
+}
+
 int main(void) {
+    char line[1024];
+    char *current;
+    char *command;
+    size_t command_len;
+
     for (;;) {
-        char cwd[1024];
-        if (getcwd(cwd, sizeof(cwd)) == NULL)
-            printf("dang, I done lost track of where we at\n");
-        else
-            printf("%s\n", cwd);
-        printf("$ ");
-
-        char line[1024];
-        if (!fgets(line, sizeof(line), stdin)) {
-            fputs("ay yo, couldn't catch what you sayin', my bad\n", stderr);
-            return EXIT_FAILURE;
-        }
-
-        char *current = line;
-        char *command;
-        size_t command_length = next_word(&current, &command);
-
-        if (IS_LITERAL(command, command_length, "cd"))
-            cd(current);
-        else if (IS_LITERAL(command, command_length, "echo"))
-            echo(current);
-        else if (IS_LITERAL(command, command_length, "exit"))
-            exit(EXIT_SUCCESS);
-        else if (IS_LITERAL(command, command_length, "pwd"))
-            pwd();
-        else if (command_length != 0)
-            printf("%.*s: that ain't no command I know, playa\n",
-                   (int)command_length, command);
-
-        printf("\n");
+        print_prompt();
+        read_line(line, sizeof(line));
+        current = line;
+        command_len = next_word(&current, &command);
+        run_command(current, command, command_len);
     }
 }
