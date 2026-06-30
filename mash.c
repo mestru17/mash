@@ -34,7 +34,7 @@ static void cd(char *input) {
     }
 
     char path[length + 1];
-    strncpy(path, arg, length);
+    memcpy(path, arg, length);
     path[length] = '\0';
     if (chdir(path) != 0)
         perror("cd: failed to change directory");
