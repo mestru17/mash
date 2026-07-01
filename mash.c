@@ -26,20 +26,20 @@ static int is_whitespace(char c) {
            c == '\v';
 }
 
-static size_t get_arg(char **s, char **arg) {
-    while (is_whitespace(**s))
-        (*s)++;
+static size_t get_arg(char *s, char **arg) {
+    while (is_whitespace(*s))
+        s++;
 
-    *arg = *s;
-    while (**s != '\0' && !is_whitespace(**s))
-        (*s)++;
+    *arg = s;
+    while (*s != '\0' && !is_whitespace(*s))
+        s++;
 
-    return *s - *arg;
+    return s - *arg;
 }
 
 static void cd(char *input) {
     char *arg;
-    size_t len = get_arg(&input, &arg);
+    size_t len = get_arg(input, &arg);
     if (len == 0) {
         fprintf(stderr, "cd: yo dawg, you gotta tell me where we rollin'\n");
         return;
@@ -61,10 +61,11 @@ static void cd(char *input) {
 
 static void echo(char *input) {
     char *arg;
-    size_t len = get_arg(&input, &arg);
+    size_t len = get_arg(input, &arg);
     if (len != 0) {
         printf("%.*s", (int)len, arg);
-        while ((len = get_arg(&input, &arg)) != 0)
+        for (input = arg + len; (len = get_arg(input, &arg)) != 0;
+             input = arg + len)
             printf(" %.*s", (int)len, arg);
     }
     printf("\n");
@@ -100,10 +101,9 @@ int main(void) {
         char line[1024];
         read_line(line, sizeof(line));
 
-        char *rest = line;
         char *command;
-        size_t len = get_arg(&rest, &command);
+        size_t len = get_arg(line, &command);
 
-        run_command(command, len, rest);
+        run_command(command, len, command + len);
     }
 }
