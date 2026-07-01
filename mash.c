@@ -26,15 +26,21 @@ static int is_whitespace(char c) {
            c == '\v';
 }
 
-static size_t get_arg(char *s, char **arg) {
+static char *skip_whitespace(char *s) {
     while (is_whitespace(*s))
         s++;
+    return s;
+}
 
-    *arg = s;
+static char *skip_arg(char *s) {
     while (*s != '\0' && !is_whitespace(*s))
         s++;
+    return s;
+}
 
-    return s - *arg;
+static size_t get_arg(char *s, char **arg) {
+    *arg = skip_whitespace(s);
+    return skip_arg(*arg) - *arg;
 }
 
 static void cd(char *input) {
