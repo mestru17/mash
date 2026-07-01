@@ -86,16 +86,16 @@ static void run_command(char *current, char *command, size_t len) {
 }
 
 int main(void) {
-    char line[1024];
-    char *current;
-    char *command;
-    size_t command_len;
-
     for (;;) {
         print_prompt();
+
+        char line[1024];
         read_line(line, sizeof(line));
-        current = line;
-        command_len = next_word(&current, &command);
+
+        char *current = line;
+        char *command;
+        size_t command_len = next_word(&current, &command);
+
         run_command(current, command, command_len);
     }
 }
