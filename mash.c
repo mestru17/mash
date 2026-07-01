@@ -3,8 +3,8 @@
 #include <string.h>
 #include <unistd.h>
 
-#define IS_LITERAL(string, length, literal)                                    \
-    length == sizeof(literal) - 1 && memcmp(string, literal, length) == 0
+#define IS_LITERAL(s, len, lit)                                                \
+    len == sizeof(lit) - 1 && memcmp(s, lit, len) == 0
 
 static void print_prompt(void) {
     char cwd[1024];
@@ -26,32 +26,34 @@ static int is_whitespace(char c) {
            c == '\v';
 }
 
-static size_t get_arg(char **current, char **start) {
-    while (is_whitespace(**current))
-        (*current)++;
-    *start = *current;
-    while (**current != '\0' && !is_whitespace(**current))
-        (*current)++;
-    return *current - *start;
+static size_t get_arg(char **s, char **arg) {
+    while (is_whitespace(**s))
+        (*s)++;
+
+    *arg = *s;
+    while (**s != '\0' && !is_whitespace(**s))
+        (*s)++;
+
+    return *s - *arg;
 }
 
 static void cd(char *input) {
     char *arg;
-    size_t length = get_arg(&input, &arg);
-    if (length == 0) {
+    size_t len = get_arg(&input, &arg);
+    if (len == 0) {
         fprintf(stderr, "cd: yo dawg, you gotta tell me where we rollin'\n");
         return;
     }
 
     char path[1024];
-    if (length >= sizeof(path)) {
+    if (len >= sizeof(path)) {
         fprintf(
             stderr,
             "cd: that path too long dawg, we ain't tryna overflow the hood\n");
         return;
     }
-    memcpy(path, arg, length);
-    path[length] = '\0';
+    memcpy(path, arg, len);
+    path[len] = '\0';
 
     if (chdir(path) != 0)
         perror("cd: nah homie, that hood don't exist");
@@ -59,11 +61,11 @@ static void cd(char *input) {
 
 static void echo(char *input) {
     char *arg;
-    size_t length = get_arg(&input, &arg);
-    if (length != 0) {
-        printf("%.*s", (int)length, arg);
-        while ((length = get_arg(&input, &arg)) != 0)
-            printf(" %.*s", (int)length, arg);
+    size_t len = get_arg(&input, &arg);
+    if (len != 0) {
+        printf("%.*s", (int)len, arg);
+        while ((len = get_arg(&input, &arg)) != 0)
+            printf(" %.*s", (int)len, arg);
     }
     printf("\n");
 }
@@ -76,11 +78,11 @@ static void pwd(void) {
         printf("%s\n", cwd);
 }
 
-static void run_command(char *current, char *command, size_t len) {
+static void run_command(char *command, size_t len, char *input) {
     if (IS_LITERAL(command, len, "cd"))
-        cd(current);
+        cd(input);
     else if (IS_LITERAL(command, len, "echo"))
-        echo(current);
+        echo(input);
     else if (IS_LITERAL(command, len, "exit"))
         exit(EXIT_SUCCESS);
     else if (IS_LITERAL(command, len, "pwd"))
@@ -98,10 +100,10 @@ int main(void) {
         char line[1024];
         read_line(line, sizeof(line));
 
-        char *current = line;
+        char *rest = line;
         char *command;
-        size_t command_len = get_arg(&current, &command);
+        size_t len = get_arg(&rest, &command);
 
-        run_command(current, command, command_len);
+        run_command(command, len, rest);
     }
 }
