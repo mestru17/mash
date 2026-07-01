@@ -44,9 +44,16 @@ static void cd(char *input) {
         return;
     }
 
-    char path[length + 1];
+    char path[1024];
+    if (length >= sizeof(path)) {
+        fprintf(
+            stderr,
+            "cd: that path too long dawg, we ain't tryna overflow the hood\n");
+        return;
+    }
     memcpy(path, arg, length);
     path[length] = '\0';
+
     if (chdir(path) != 0)
         perror("cd: nah homie, that hood don't exist");
 }
