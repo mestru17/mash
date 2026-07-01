@@ -26,7 +26,7 @@ static int is_whitespace(char c) {
            c == '\v';
 }
 
-static size_t next_word(char **current, char **start) {
+static size_t get_arg(char **current, char **start) {
     while (is_whitespace(**current))
         (*current)++;
     *start = *current;
@@ -37,7 +37,7 @@ static size_t next_word(char **current, char **start) {
 
 static void cd(char *input) {
     char *arg;
-    size_t length = next_word(&input, &arg);
+    size_t length = get_arg(&input, &arg);
     if (length == 0) {
         fprintf(stderr, "cd: yo dawg, you gotta tell me where we rollin'\n");
         return;
@@ -59,10 +59,10 @@ static void cd(char *input) {
 
 static void echo(char *input) {
     char *arg;
-    size_t length = next_word(&input, &arg);
+    size_t length = get_arg(&input, &arg);
     if (length != 0) {
         printf("%.*s", (int)length, arg);
-        while ((length = next_word(&input, &arg)) != 0)
+        while ((length = get_arg(&input, &arg)) != 0)
             printf(" %.*s", (int)length, arg);
     }
     printf("\n");
@@ -100,7 +100,7 @@ int main(void) {
 
         char *current = line;
         char *command;
-        size_t command_len = next_word(&current, &command);
+        size_t command_len = get_arg(&current, &command);
 
         run_command(current, command, command_len);
     }
