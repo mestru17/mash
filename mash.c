@@ -9,10 +9,9 @@
 static void print_prompt(void) {
     char cwd[1024];
     if (getcwd(cwd, sizeof(cwd)) == NULL)
-        printf("dang, I done lost track of where we at\n");
+        printf("dang, I done lost track of where we at\n$ ");
     else
-        printf("%s\n", cwd);
-    printf("$ ");
+        printf("%s\n$ ", cwd);
 }
 
 static void read_line(char *line, size_t len) {
