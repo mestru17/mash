@@ -16,7 +16,7 @@ static void print_prompt(void) {
 
 static void read_line(char *line, size_t len) {
     if (!fgets(line, len, stdin)) {
-        fputs("ay yo, couldn't catch what you sayin', my bad\n", stderr);
+        fprintf(stderr, "ay yo, couldn't catch what you sayin', my bad\n");
         exit(EXIT_FAILURE);
     }
 }
